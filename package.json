@@ -1,0 +1,41 @@
+{
+  "name": "ecash",
+  "version": "1.0.0",
+  "description": "A Cashu ecash mint implemented in pure Hoon, running as a Gall agent on Urbit.",
+  "license": "PolyForm-Noncommercial-1.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22.4"
+  },
+  "dependencies": {
+    "@cashu/cashu-ts": "^4.5.1",
+    "@noble/curves": "^2.0.1"
+  },
+  "scripts": {
+    "test": "node run-tests.mjs",
+    "test:all": "node run-tests.mjs",
+    "test:vectors": "node test-vectors.mjs",
+    "test:admin-auth": "node test-admin-auth.mjs",
+    "test:legacy-removed": "node test-legacy-removed.mjs",
+    "test:parse-robustness": "node test-parse-robustness.mjs",
+    "test:dashboards": "node test-dashboards.mjs",
+    "test:e2e": "node test-e2e.mjs",
+    "test:swap-security": "node test-swap-security.mjs",
+    "test:p2pk": "node test-p2pk.mjs",
+    "test:self-method": "node test-self-method.mjs",
+    "test:admin": "node test-admin.mjs",
+    "test:restore": "node test-restore.mjs",
+    "test:ladder": "node test-ladder.mjs",
+    "test:limits": "node test-limits.mjs",
+    "test:lightning": "node test-lightning.mjs",
+    "test:melt-fee": "node test-melt-fee.mjs",
+    "test:conformance": "node test-conformance.mjs",
+    "test:tessera": "node test-tessera.mjs",
+    "test:tessera-ships": "node test-tessera-ships.mjs",
+    "test:melt": "node test-melt-pending.mjs",
+    "test:security": "node run-tests.mjs test-admin-auth test-legacy-removed test-parse-robustness test-self-method test-swap-security",
+    "mock:lnbits": "node mock-lnbits.mjs",
+    "demo": "node demo.mjs",
+    "bench": "node bench-crypto.mjs"
+  }
+}

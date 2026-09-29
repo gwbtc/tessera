@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Ecash Mint Admin</title>
+<style>
+:root{color-scheme:dark}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f0a00;color:#e2e8f0;min-height:100vh}
+.hdr{background:#1a1000;border-bottom:1px solid #3d2200;padding:14px 24px;display:flex;align-items:center;gap:12px}
+.hdr h1{font-size:1.15rem;font-weight:700;color:#f8fafc}
+.ver{font-size:.65rem;background:#f7931a;color:#0f0a00;padding:2px 8px;border-radius:12px;font-weight:700}
+.sta{margin-left:auto;font-size:.8rem;color:#64748b}
+.wrap{max-width:1200px;margin:0 auto;padding:20px 24px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.box{background:#1a1000;border:1px solid #3d2200;border-radius:10px;padding:16px}
+.num{font-size:1.8rem;font-weight:700;color:#f7931a}
+.num.sm{font-size:.9rem;word-break:break-all}
+.num.neg{color:#fca5a5}
+.lbl{color:#94a3b8;font-size:.8rem;margin-top:4px}
+.card{background:#1a1000;border:1px solid #3d2200;border-radius:10px;margin-bottom:16px}
+.ch{padding:14px 18px;border-bottom:1px solid #3d2200;display:flex;align-items:center;justify-content:space-between;font-weight:600;font-size:.95rem}
+.cb{padding:18px}
+.tabs{display:flex;gap:2px;background:#0f0a00;padding:3px;border-radius:8px;margin-bottom:20px;width:fit-content;border:1px solid #3d2200;flex-wrap:wrap}
+.tab{padding:7px 14px;border-radius:6px;cursor:pointer;font-size:.82rem;font-weight:500;color:#94a3b8;border:none;background:transparent;transition:all .15s}
+.tab.on{background:#f7931a;color:#0f0a00;font-weight:700}
+.tab:hover:not(.on){color:#f7931a}
+.sec{display:none}.sec.on{display:block}
+.lnk{background:none;border:none;padding:0;font:inherit;color:inherit;cursor:pointer;text-align:left}
+.lnk:hover{text-decoration:underline}
+.tw{overflow-x:auto}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{text-align:left;padding:10px 12px;background:#0f0a00;color:#94a3b8;font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.tbl td{padding:10px 12px;border-top:1px solid #1f1500;font-size:.85rem}
+.tbl tr:hover td{background:#1f1500}
+.badge{display:inline-block;padding:2px 10px;border-radius:12px;font-size:.72rem;font-weight:600}
+.b-active{background:#062e16;color:#34d399}
+.b-inactive{background:#1f2937;color:#9ca3af}
+.b-paid{background:#062e16;color:#34d399}
+.b-unpaid{background:#3d1a00;color:#fbbf24}
+.b-issued{background:#1e1b4b;color:#a78bfa}
+.b-pending{background:#3d1a00;color:#fb923c}
+.b-expired{background:#1f2937;color:#9ca3af}
+.mono{font-family:'SF Mono',Consolas,monospace;font-size:.8rem}
+.muted{color:#64748b}
+.accent{color:#f7931a}
+.kgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px}
+.ki{background:#0f0a00;border:1px solid #3d2200;border-radius:8px;padding:10px;text-align:center;cursor:pointer;transition:border-color .15s;font:inherit;color:inherit}
+.ki:hover{border-color:#f7931a}
+.ka{display:block;font-size:1rem;font-weight:700;color:#f7931a}
+.kp{display:block;font-size:.6rem;color:#64748b;word-break:break-all;margin-top:4px}
+.btn{padding:8px 16px;background:#f7931a;color:#0f0a00;border:none;border-radius:8px;cursor:pointer;font-size:.82rem;font-weight:700;transition:all .15s;white-space:nowrap}
+.btn:hover{background:#e8840f}
+.btn:disabled{background:#3d2200;color:#64748b;cursor:not-allowed}
+.btn-sm{padding:5px 10px;font-size:.75rem;border-radius:6px}
+.btn-sec{background:#3d1a00;color:#f7931a;border:1px solid rgba(247,147,26,0.3)}
+.btn-sec:hover:not(:disabled){background:#4d2a00}
+.btn-danger{background:#7f1d1d;color:#fca5a5}
+.btn-danger:hover{background:#991b1b}
+.rbtn{background:transparent;border:1px solid #3d2200;color:#94a3b8;padding:5px 10px;border-radius:6px;cursor:pointer;font-size:.78rem}
+.rbtn:hover{border-color:#f7931a;color:#f7931a}
+.rbtn:disabled{opacity:.4;cursor:not-allowed}
+.rbtn-bad{color:#fca5a5;border-color:#7f1d1d}
+.fld{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.fld label{font-size:.8rem;color:#94a3b8}
+.fld input,.fld select{width:100%;background:#0f0a00;border:1px solid #3d2200;color:#e2e8f0;padding:8px 12px;border-radius:8px;font-size:.85rem;font-family:'SF Mono',Consolas,monospace}
+.res{margin-top:12px;padding:12px;background:#0f0a00;border:1px solid #3d2200;border-radius:8px;font-family:monospace;font-size:.78rem;white-space:pre-wrap;word-break:break-all;color:#fbbf24;max-height:300px;overflow-y:auto;display:none}
+.res.err{color:#fca5a5;border-color:#7f1d1d;background:#1c0505}
+.res.ok{color:#86efac;border-color:#065f46}
+.hint{font-size:.72rem;color:#64748b;margin-top:4px}
+.toast{position:fixed;bottom:20px;right:20px;background:#f7931a;color:#0f0a00;padding:10px 20px;border-radius:8px;font-weight:700;font-size:.85rem;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.dot-ok{background:#34d399}
+.dot-warn{background:#fbbf24}
+.empty{padding:32px;text-align:center;color:#64748b;font-size:.85rem}
+.detail-back{background:none;border:none;padding:0;font:inherit;cursor:pointer;color:#f7931a;font-size:.85rem;margin-bottom:12px;display:inline-block}
+.detail-back:hover{text-decoration:underline}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:768px){.split{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,1fr)}}
+.q-filter{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.q-filter button{padding:4px 12px;border-radius:14px;font-size:.75rem;border:1px solid #3d2200;background:transparent;color:#94a3b8;cursor:pointer}
+.q-filter button.on{background:#f7931a;color:#0f0a00;border-color:#f7931a;font-weight:600}
+.q-filter button:hover:not(.on){border-color:#f7931a;color:#f7931a}
+.val-section{border-left:3px solid #f7931a;padding-left:12px;margin-bottom:16px}
+.val-section .hint-label{color:#f7931a;font-size:.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.srow.danger{border:1px solid #7f1d1d;background:#1a0e0e;border-radius:6px;padding:8px;margin-top:8px}
+.warn{color:#fca5a5;font-size:12px;margin-left:8px}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <span style="font-size:1.4rem">&#x20BF;</span>
+  <h1>Ecash Mint</h1>
+  <span class="ver">Admin</span>
+  <span class="sta" id="sta">Loading...</span>
+</div>
+<div class="wrap">
+  <div class="grid" id="stats"></div>
+  <div class="tabs" id="main-tabs">
+    <button class="tab on" data-tab="ov">Overview</button>
+    <button class="tab" data-tab="ks">Keysets</button>
+    <button class="tab" data-tab="qt">Quotes</button>
+    <button class="tab" data-tab="tk">Tokens</button>
+    <button class="tab" data-tab="ln">Lightning</button>
+    <button class="tab" data-tab="nf">Info</button>
+  </div>
+
+  <!-- Overview Tab -->
+  <div id="sec-ov" class="sec on">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:.82rem;color:#94a3b8">
+      <label for="autorefresh"><input type="checkbox" id="autorefresh" checked> auto-refresh</label> <span id="updated"></span>
+    </div>
+    <div class="val-section">
+      <div class="hint-label">&#x20BF; Value-bearing</div>
+      <div class="card" id="ov-liability-card">
+        <div class="ch"><span>Outstanding Liability</span></div>
+        <div class="cb" id="ov-liability"><em class="muted">Loading...</em></div>
+      </div>
+      <div class="split">
+        <div class="card">
+          <div class="ch"><span>Mint Quotes</span></div>
+          <div class="cb" id="ov-mint-quotes"><em class="muted">Loading...</em></div>
+        </div>
+        <div class="card">
+          <div class="ch"><span>Melt Quotes</span></div>
+          <div class="cb" id="ov-melt-quotes"><em class="muted">Loading...</em></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ch"><span>Active Keyset</span><button class="rbtn" data-act="loadOverview">Refresh</button></div>
+        <div class="cb" id="ov-keyset"><em class="muted">Loading...</em></div>
+      </div>
+    </div>
+    <div class="val-section">
+      <div class="hint-label">Mint configuration</div>
+    <div class="card">
+      <div class="ch"><span>Mint Settings</span></div>
+      <div class="cb">
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
+          <div class="fld" style="flex:1;min-width:140px">
+            <label for="st-fee-pct">Fee reserve (bps, 100 = 1%)</label>
+            <input id="st-fee-pct" type="number" min="0" placeholder="100">
+            <div class="hint" id="st-fee-eff"></div>
+          </div>
+          <div class="fld" style="flex:1;min-width:140px">
+            <label for="st-fee-min">Fee Reserve Min (sats)</label>
+            <input id="st-fee-min" type="number" min="0" placeholder="10">
+          </div>
+          <div class="fld" style="flex:1;min-width:140px">
+            <label for="st-ttl">Quote TTL (seconds)</label>
+            <input id="st-ttl" type="number" min="60" placeholder="3600">
+            <div class="hint">Default: 3600 (1 hour); minimum 60</div>
+          </div>
+          <button class="btn btn-sm" data-act="updateSettings">Save</button>
+        </div>
+        <div class="srow danger">
+          <label for="self-enabled"><input type="checkbox" id="self-enabled"> Enable <code>self</code> mint/melt</label>
+          <span class="warn">&#x26A0; lets anyone mint tokens with no payment — testing only; leave OFF in production</span>
+        </div>
+        <div class="res" id="st-res"></div>
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <!-- Keysets Tab -->
+  <div id="sec-ks" class="sec">
+    <div class="res" id="ks-action-res" style="margin:0 0 12px"></div>
+    <div id="ks-list-view">
+      <div class="card">
+        <div class="ch">
+          <span>All Keysets</span>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-sm" data-act="generateKeyset">Generate New</button>
+            <button class="rbtn" data-act="loadKeysets">Refresh</button>
+          </div>
+        </div>
+        <div class="cb" id="ks-body"><em class="muted">Loading...</em></div>
+      </div>
+    </div>
+    <div id="ks-detail-view" style="display:none">
+      <button class="detail-back" data-act="showKeysetList">&larr; Back to keysets</button>
+      <div class="card">
+        <div class="ch"><span>Keyset Detail</span></div>
+        <div class="cb" id="ks-detail"><em class="muted">Loading...</em></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quotes Tab -->
+  <div id="sec-qt" class="sec">
+    <div class="card">
+      <div class="ch"><span>All Quotes</span><button class="rbtn" data-act="loadQuotes">Refresh</button></div>
+      <div class="cb">
+        <div class="q-filter" id="qt-filter">
+          <button class="on" data-f="all">All</button>
+          <button data-f="mint">Mint</button>
+          <button data-f="melt">Melt</button>
+          <button data-f="UNPAID">Unpaid</button>
+          <button data-f="PENDING">Pending</button>
+          <button data-f="PAID">Paid</button>
+          <button data-f="ISSUED">Issued</button>
+        </div>
+        <div class="res" id="qt-res" style="margin:0 0 12px"></div>
+        <div id="qt-body"><em class="muted">Loading...</em></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tokens Tab -->
+  <div id="sec-tk" class="sec">
+    <div class="split">
+      <div class="card">
+        <div class="ch"><span>Spent Tokens</span><button class="rbtn" data-act="loadSpent">Refresh</button></div>
+        <div class="cb" id="tk-spent"><em class="muted">Loading...</em></div>
+      </div>
+      <div class="card">
+        <div class="ch"><span>Check Token State</span></div>
+        <div class="cb">
+          <div class="fld">
+            <label for="tk-check-input">Secret or Y-point (hex)</label>
+            <input id="tk-check-input" placeholder="secret string, or 66-hex Y point starting 02/03">
+          </div>
+          <button class="btn btn-sm" data-act="checkSpent">Check</button>
+          <div class="res" id="tk-check-res"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lightning Tab -->
+  <div id="sec-ln" class="sec">
+    <div class="split">
+      <div class="card">
+        <div class="ch"><span>Current Backend</span><button class="rbtn" data-act="loadLightning">Refresh</button></div>
+        <div class="cb" id="ln-body"><em class="muted">Loading...</em></div>
+      </div>
+      <div class="card">
+        <div class="ch"><span>Configure Backend</span></div>
+        <div class="cb">
+          <div class="fld">
+            <label for="ln-type">Backend Type</label>
+            <select id="ln-type" data-change="toggleLnFields">
+              <option value="lnbits">LNbits</option>
+              <option value="lnd">LND</option>
+              <option value="none">None (disable)</option>
+            </select>
+          </div>
+          <div id="ln-fields">
+            <div class="fld">
+              <label for="ln-url">URL</label>
+              <input id="ln-url" placeholder="http://localhost:3338">
+            </div>
+            <div class="fld" id="ln-apikey-field">
+              <label for="ln-apikey">API Key</label>
+              <input id="ln-apikey" placeholder="admin API key" type="password">
+            </div>
+            <div class="fld" id="ln-macaroon-field" style="display:none">
+              <label for="ln-macaroon">Macaroon (hex)</label>
+              <input id="ln-macaroon" placeholder="hex-encoded macaroon" type="password">
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:4px">
+            <button class="btn btn-sm" data-act="configureLn">Save</button>
+            <button class="btn btn-sm btn-sec" data-act="testLn">Test</button>
+          </div>
+          <div class="res" id="ln-config-res"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info Tab -->
+  <div id="sec-nf" class="sec">
+    <div class="split">
+      <div class="card">
+        <div class="ch"><span>Mint Information (NUT-06)</span><button class="rbtn" data-act="loadInfo">Refresh</button></div>
+        <div class="cb" id="nf-body"><em class="muted">Loading...</em></div>
+      </div>
+      <div class="card">
+        <div class="ch"><span>Edit Mint Info</span></div>
+        <div class="cb">
+          <div class="fld">
+            <label for="nf-name">Mint Name</label>
+            <input id="nf-name" placeholder="ecash-mint">
+          </div>
+          <div class="fld">
+            <label for="nf-desc">Description</label>
+            <input id="nf-desc" placeholder="Cashu ecash mint on Urbit">
+          </div>
+          <button class="btn btn-sm" data-act="updateInfo">Save</button>
+          <div class="res" id="nf-res"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script type="module" nonce="__CSP_NONCE__">
+const ADMIN = "/apps/ecash/admin/api";
+const PAGE = 50;  // quotes rendered per page
+let allQuotes = [], currentFilter = 'all', qPage = 0;
+let activeKeysetId = '';  // from /overview; the keyset the mint signs with
+let curKs = null;         // keyset shown in the detail view
+let selfWas = false;      // self_method_enabled as last read from / saved to the server
+
+// ── Helpers ──────────────────────────────────────────────────
+// Read the body ONCE (a second read throws "body stream already read"). Errors are
+// JSON {detail} normally, but an Eyre/proxy error page may not be JSON at all.
+async function adminApi(path, opts) {
+  const r = await fetch(ADMIN + path, opts);
+  const text = await r.text();
+  let body = null;
+  try { body = JSON.parse(text); } catch {}
+  if (!r.ok) throw new Error(body && body.detail != null ? String(body.detail) : "HTTP " + r.status);
+  if (!body || typeof body !== 'object') throw new Error("HTTP " + r.status + ": unexpected non-JSON response");
+  return body;
+}
+const post = (p, b) => adminApi(p, {
+  method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(b || {})
+});
+
+const esc = (s) => String(s == null ? '' : s)
+  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  .replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+
+const errBox = (e) => `<div class="res err" style="display:block">${esc(e.message)}</div>`;
+
+function box(val, label, cls) {
+  const isLong = String(val).length > 16;
+  return `<div class="box"><div class="num ${isLong ? 'sm' : ''} ${cls || ''}">${esc(val)}</div><div class="lbl">${esc(label)}</div></div>`;
+}
+
+function badge(text, type) {
+  return `<span class="badge b-${type}">${esc(text)}</span>`;
+}
+
+function fmtDate(unix) {
+  if (!unix) return '?';
+  return new Date(unix * 1000).toLocaleString();
+}
+
+function truncId(id, n) {
+  if (!id) return '?';
+  id = String(id);
+  n = n || 16;
+  return id.length > n ? id.slice(0, n) + '...' : id;
+}
+
+// A keyboard-reachable "click to copy" value. n = truncate length (0 = full).
+const copyBtn = (v, n, cls) =>
+  `<button class="lnk mono ${cls || ''}" data-act="copyText" data-arg="${esc(v)}" title="Copy ${esc(v)}">${esc(n ? truncId(v, n) : v)}</button>`;
+
+function copyText(t) {
+  if (navigator.clipboard) navigator.clipboard.writeText(t).then(() => toast('Copied!'), () => copyFallback(t));
+  else copyFallback(t);
+}
+// navigator.clipboard only exists in secure contexts (not plain HTTP on a LAN IP).
+function copyFallback(t) {
+  const ta = document.createElement('textarea');
+  ta.value = t;
+  ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+  document.body.appendChild(ta);
+  ta.select();
+  let ok = false;
+  try { ok = document.execCommand('copy'); } catch {}
+  ta.remove();
+  if (ok) toast('Copied!'); else prompt('Copy this value:', t);
+}
+
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.style.opacity = "1";
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.style.opacity = "0"; }, 1500);
+}
+
+function showResult(elId, text, type) {
+  const el = document.getElementById(elId);
+  el.style.display = 'block';
+  el.className = 'res' + (type ? ' ' + type : '');
+  el.textContent = text;
+}
+
+// Strong confirmation for destructive money actions: the operator must type `word`.
+function typedConfirm(msg, word) {
+  const v = prompt(msg + '\n\nType ' + word + ' to confirm:');
+  if (v === null) return false;
+  if (v.trim() !== word) { alert('Confirmation did not match. Nothing was done.'); return false; }
+  return true;
+}
+
+// ── Tab Switching ────────────────────────────────────────────
+document.querySelectorAll("#main-tabs .tab").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("#main-tabs .tab").forEach(t => t.classList.remove("on"));
+    document.querySelectorAll(".sec").forEach(s => s.classList.remove("on"));
+    btn.classList.add("on");
+    document.getElementById("sec-" + btn.dataset.tab).classList.add("on");
+    if (btn.dataset.tab === 'ov') loadOverview();
+  });
+});
+
+// ── Auto-refresh (shared) ────────────────────────────────────
+// Runs on every tab: the stats bar and the Online/Error status are global.
+let _ar = null, _arAt = 0;
+function startAuto(loader, sec) {
+  stopAuto();
+  if (!document.getElementById('autorefresh')?.checked) return;
+  _ar = setInterval(() => loader(true), (sec || 10) * 1000);
+}
+function stopAuto() { if (_ar) { clearInterval(_ar); _ar = null; } }
+function stampUpdated() {
+  _arAt = Date.now();
+  const el = document.getElementById('updated'); if (el) el.textContent = 'updated just now';
+}
+setInterval(() => {
+  const el = document.getElementById('updated');
+  if (el && _arAt) { const s = Math.round((Date.now() - _arAt) / 1000); el.textContent = `updated ${s}s ago`; }
+}, 1000);
+
+// ── Overview + Stats Bar (one /overview fetch renders both) ──
+async function loadOverview(silent) {
+  const sta = document.getElementById("sta");
+  try {
+    const d = await adminApi("/overview");
+    activeKeysetId = d.active_keyset || '';
+
+    // Outstanding liability (issued − redeemed). Can go negative after a revoke.
+    const issued = Number(d.total_issued_sats) || 0;
+    const redeemed = Number(d.total_redeemed_sats) || 0;
+    const outstanding = issued - redeemed;
+
+    document.getElementById("stats").innerHTML =
+      box(d.tokens_issued || 0, "Tokens Issued") +
+      box(d.spent_count || 0, "Tokens Spent") +
+      box(issued.toLocaleString(), "Issued (sats)") +
+      box(redeemed.toLocaleString(), "Redeemed (sats)") +
+      box(outstanding.toLocaleString(), "Outstanding (sats)", outstanding < 0 ? 'neg' : '') +
+      box(d.ln_backend?.configured ? d.ln_backend.type : "none", "LN Backend") +
+      box(d.pending_requests || 0, "Pending Requests");
+
+    document.getElementById("ov-liability").innerHTML = `
+      <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-end">
+        <div>
+          <div class="num ${outstanding < 0 ? 'neg' : ''}">${esc(outstanding.toLocaleString())}</div>
+          <div class="lbl">Outstanding (sats)</div>
+        </div>
+        <div>
+          <div class="num sm" style="font-size:1.1rem">${esc(issued.toLocaleString())}</div>
+          <div class="lbl">Issued (sats)</div>
+        </div>
+        <div>
+          <div class="num sm" style="font-size:1.1rem">${esc(redeemed.toLocaleString())}</div>
+          <div class="lbl">Redeemed (sats)</div>
+        </div>
+      </div>
+      <div class="hint" style="margin-top:8px">Outstanding = issued − redeemed. This is the mint's live token liability.</div>
+      ${outstanding < 0 ? '<div class="hint" style="color:#fca5a5">Negative: more was redeemed than is recorded as issued (e.g. tokens from a revoked ISSUED quote were redeemed after all).</div>' : ''}
+    `;
+
+    // Mint quotes summary
+    const mq = d.mint_quotes || {};
+    const mqTotal = (mq.unpaid||0) + (mq.paid||0) + (mq.issued||0) + (mq.pending||0);
+    document.getElementById("ov-mint-quotes").innerHTML = `
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:8px">
+        <div>${badge("UNPAID", "unpaid")} <strong>${esc(mq.unpaid||0)}</strong></div>
+        <div>${badge("PAID", "paid")} <strong>${esc(mq.paid||0)}</strong></div>
+        <div>${badge("ISSUED", "issued")} <strong>${esc(mq.issued||0)}</strong></div>
+        <div>${badge("PENDING", "pending")} <strong>${esc(mq.pending||0)}</strong></div>
+      </div>
+      <div class="muted" style="font-size:.78rem">Total: ${esc(mqTotal)} quotes</div>
+    `;
+
+    // Melt quotes summary
+    const lq = d.melt_quotes || {};
+    const lqTotal = (lq.unpaid||0) + (lq.paid||0) + (lq.pending||0);
+    document.getElementById("ov-melt-quotes").innerHTML = `
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:8px">
+        <div>${badge("UNPAID", "unpaid")} <strong>${esc(lq.unpaid||0)}</strong></div>
+        <div>${badge("PAID", "paid")} <strong>${esc(lq.paid||0)}</strong></div>
+        <div>${badge("PENDING", "pending")} <strong>${esc(lq.pending||0)}</strong></div>
+      </div>
+      <div class="muted" style="font-size:.78rem">Total: ${esc(lqTotal)} quotes</div>
+    `;
+
+    // Active keyset
+    if (d.active_keyset) {
+      const ks = await adminApi("/keysets/" + encodeURIComponent(d.active_keyset));
+      const keys = Object.entries(ks.keys || {}).sort((a,b) => +a[0] - +b[0]);
+      document.getElementById("ov-keyset").innerHTML = `
+        <div style="margin-bottom:12px">
+          ${badge("Active", "active")}
+          <span style="margin-left:8px">${copyBtn(ks.id, 24, 'accent')}</span>
+          <span class="muted" style="margin-left:8px">unit: ${esc(ks.unit || 'sat')}</span>
+          <span class="muted" style="margin-left:8px">fee: ${esc(ks.input_fee_ppk || 0)} ppk</span>
+          <span class="muted" style="margin-left:8px">created: ${esc(fmtDate(ks.created))}</span>
+        </div>
+        <div class="kgrid">
+          ${keys.map(([a,p]) => `<button class="ki" data-act="copyText" data-arg="${esc(p)}" title="Copy ${esc(p)}"><span class="ka">${esc(a)}</span><span class="kp">${esc(truncId(p,14))}</span></button>`).join("")}
+        </div>
+        <div class="hint" style="margin-top:8px">Click denomination to copy public key</div>
+      `;
+    } else {
+      document.getElementById("ov-keyset").innerHTML = '<div class="empty">No active keyset</div>';
+    }
+    sta.textContent = "Online";
+    sta.style.color = "#34d399";
+    stampUpdated();
+  } catch(e) {
+    sta.textContent = "Error: " + e.message;
+    sta.style.color = "#fca5a5";
+    if (!silent) document.getElementById("ov-keyset").innerHTML = errBox(e);
+  }
+}
+
+// ── Settings ─────────────────────────────────────────────────
+function showFeeEff() {
+  const v = parseInt(document.getElementById("st-fee-pct").value, 10);
+  document.getElementById("st-fee-eff").textContent = isNaN(v) ? '' : '= ' + (v / 100).toFixed(2) + '% of the melt amount';
+}
+document.getElementById("st-fee-pct").addEventListener("input", showFeeEff);
+
+async function loadSettings() {
+  try {
+    const d = await adminApi("/settings");
+    document.getElementById("st-fee-pct").value = d.fee_reserve_pct ?? 100;
+    document.getElementById("st-fee-min").value = d.fee_reserve_min ?? 10;
+    document.getElementById("st-ttl").value = d.quote_ttl_secs ?? 3600;
+    selfWas = !!d.self_method_enabled;
+    document.getElementById('self-enabled').checked = selfWas;
+    showFeeEff();
+  } catch(e) {
+    showResult("st-res", "Error loading settings: " + e.message, "err");
+  }
+}
+
+const SELF_WARN = 'Turn ON self mint/melt?\n\n' +
+  'Self-minting creates FREE, UNBACKED tokens: anyone who can reach this mint can mint ecash without paying anything. ' +
+  'Those tokens can then be melted over Lightning, draining real funds.\n\n' +
+  'It must NEVER be on for a mint with real Lightning funds. Testing only.\n\nEnable it?';
+
+async function updateSettings() {
+  const pct = parseInt(document.getElementById("st-fee-pct").value);
+  const min = parseInt(document.getElementById("st-fee-min").value);
+  const ttl = parseInt(document.getElementById("st-ttl").value);
+  if (isNaN(pct) || isNaN(min) || isNaN(ttl)) { alert('All fields required'); return; }
+  if (ttl < 60) { alert('TTL must be at least 60 seconds'); return; }
+  const selfBox = document.getElementById('self-enabled');
+  const selfOn = selfBox.checked;
+  // Warn only on the off→on transition, not on every save while it is already on.
+  if (selfOn && !selfWas && !confirm(SELF_WARN)) { selfBox.checked = false; return; }
+  try {
+    const d = await post("/settings", {fee_reserve_pct: pct, fee_reserve_min: min, quote_ttl_secs: ttl, self_method_enabled: selfOn});
+    selfWas = !!d.self_method_enabled;
+    selfBox.checked = selfWas;
+    const pctDisplay = (d.fee_reserve_pct / 100).toFixed(2);
+    const ttlDisplay = d.quote_ttl_secs >= 3600 ? (d.quote_ttl_secs / 3600) + 'h' : (d.quote_ttl_secs / 60) + 'm';
+    showResult("st-res", "Saved: fee reserve " + pctDisplay + "% (" + d.fee_reserve_pct + " bps, min " + d.fee_reserve_min +
+      " sats), TTL " + ttlDisplay + ", self mint/melt " + (selfWas ? "ON" : "off"), "ok");
+  } catch(e) {
+    showResult("st-res", "Error: " + e.message, "err");
+  }
+}
+
+// ── Keysets Tab ──────────────────────────────────────────────
+const isCurrentKs = (k) => activeKeysetId ? k.id === activeKeysetId : !!k.active;
+
+async function loadKeysets() {
+  try {
+    const d = await adminApi("/keysets");
+    const keysets = d.keysets || [];
+    if (!keysets.length) {
+      document.getElementById("ks-body").innerHTML = '<div class="empty">No keysets found</div>';
+      return;
+    }
+    document.getElementById("ks-body").innerHTML = `
+      <div class="tw"><table class="tbl">
+        <thead><tr>
+          <th>ID</th><th>Unit</th><th>Status</th><th>Keys</th><th>Fee (ppk)</th><th>Created</th><th>Actions</th>
+        </tr></thead>
+        <tbody>
+          ${keysets.map(k => {
+            const cur = isCurrentKs(k);
+            return `<tr>
+            <td class="mono accent">${esc(truncId(k.id, 20))}</td>
+            <td>${esc(k.unit || 'sat')}</td>
+            <td>${k.active ? badge('Active', 'active') : badge('Inactive', 'inactive')}</td>
+            <td>${esc(k.key_count || k.denominations?.length || '?')}</td>
+            <td>${esc(k.input_fee_ppk || 0)}</td>
+            <td class="muted">${esc(fmtDate(k.created))}</td>
+            <td style="white-space:nowrap">
+              <button class="rbtn" data-act="viewKeyset" data-arg="${esc(k.id)}">View</button>
+              ${cur ? '' : `<button class="rbtn" style="color:#34d399;border-color:#065f46" data-act="activateKeyset" data-arg="${esc(k.id)}">Activate</button>`}
+              ${k.active && !cur ? `<button class="rbtn rbtn-bad" data-act="deactivateKeyset" data-arg="${esc(k.id)}">Deactivate</button>` : ''}
+            </td>
+          </tr>`;
+          }).join("")}
+        </tbody>
+      </table></div>
+    `;
+  } catch(e) {
+    document.getElementById("ks-body").innerHTML = errBox(e);
+  }
+}
+
+// After any keyset mutation: overview first so activeKeysetId is current.
+async function refreshKeysets() {
+  await loadOverview(true);
+  await loadKeysets();
+}
+
+async function generateKeyset() {
+  if (!confirm('Generate a new keyset with random keys? It will be created as inactive.')) return;
+  try {
+    const d = await post("/keysets/generate");
+    showResult("ks-action-res", "Keyset generated: " + d.id + " (" + d.key_count + " keys, inactive)", "ok");
+    await refreshKeysets();
+  } catch(e) {
+    showResult("ks-action-res", "Error: " + e.message, "err");
+  }
+}
+
+async function activateKeyset(id) {
+  if (!confirm('Activate this keyset? The current active keyset will be deactivated.\n\nID: ' + id)) return;
+  try {
+    await post("/keysets/activate", {id});
+    showResult("ks-action-res", "Keyset activated: " + truncId(id, 24), "ok");
+    await refreshKeysets();
+    if (curKs && curKs.id === id) viewKeyset(id);
+  } catch(e) {
+    showResult("ks-action-res", "Error: " + e.message, "err");
+  }
+}
+
+async function deactivateKeyset(id) {
+  if (!confirm('Deactivate this keyset? The mint stops signing new outputs with it; tokens already issued under it still redeem.\n\nID: ' + id)) return;
+  try {
+    await post("/keysets/deactivate", {id});
+    showResult("ks-action-res", "Keyset deactivated: " + truncId(id, 24), "ok");
+    await refreshKeysets();
+    if (curKs && curKs.id === id) viewKeyset(id);
+  } catch(e) {
+    showResult("ks-action-res", "Error: " + e.message, "err");
+  }
+}
+
+async function setKeysetFee() {
+  const ks = curKs;
+  if (!ks) return;
+  const currentFee = ks.input_fee_ppk || 0;
+  const input = prompt('Set input fee (parts per thousand) for keyset:\n' + ks.id + '\n\nCurrent fee: ' + currentFee + ' ppk', currentFee);
+  if (input === null) return;
+  const fee = parseInt(input, 10);
+  if (isNaN(fee) || fee < 0) { alert('Invalid fee value'); return; }
+  if (fee !== currentFee && isCurrentKs(ks) && !confirm(
+    'This is the ACTIVE keyset. Changing its fee ROTATES the mint to fresh keys under a NEW keyset id and deactivates this one.\n\n' +
+    'Tokens already issued under the old id still redeem, but wallets must refetch the mint\'s keys before they can mint or swap against the new keyset.\n\nContinue?')) return;
+  try {
+    const d = await post("/keysets/set-fee", {id: ks.id, input_fee_ppk: fee});
+    if (d.old_id === d.new_id) {
+      showResult("ks-action-res", "Fee unchanged (" + d.input_fee_ppk + " ppk): nothing to do, keyset id kept.", "ok");
+    } else {
+      showResult("ks-action-res", "Fee set to " + d.input_fee_ppk + " ppk under fresh keys.\nNew keyset id: " + d.new_id +
+        "\nOld id " + d.old_id + " is now inactive; tokens issued under it still redeem.", "ok");
+    }
+    await refreshKeysets();
+    viewKeyset(d.new_id);
+  } catch(e) {
+    showResult("ks-action-res", "Error setting fee: " + e.message, "err");
+  }
+}
+
+async function viewKeyset(id) {
+  document.getElementById("ks-list-view").style.display = "none";
+  document.getElementById("ks-detail-view").style.display = "block";
+  document.getElementById("ks-detail").innerHTML = '<em class="muted">Loading...</em>';
+  try {
+    const ks = await adminApi("/keysets/" + encodeURIComponent(id));
+    curKs = ks;
+    const cur = isCurrentKs(ks);
+    const keys = Object.entries(ks.keys || {}).sort((a,b) => +a[0] - +b[0]);
+    document.getElementById("ks-detail").innerHTML = `
+      <div style="margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap">
+          ${ks.active ? badge('Active', 'active') : badge('Inactive', 'inactive')}
+          ${copyBtn(ks.id, 0, 'muted')}
+        </div>
+        <div class="muted" style="font-size:.82rem;margin-bottom:12px">
+          Unit: ${esc(ks.unit || 'sat')} &middot; Fee: ${esc(ks.input_fee_ppk || 0)} ppk &middot; Created: ${esc(fmtDate(ks.created))}
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          ${cur ? '' : `<button class="btn btn-sm" style="background:#065f46;color:#34d399" data-act="activateKeyset" data-arg="${esc(ks.id)}">Activate</button>`}
+          ${ks.active && !cur ? `<button class="btn btn-sm btn-danger" data-act="deactivateKeyset" data-arg="${esc(ks.id)}">Deactivate</button>` : ''}
+          <button class="btn btn-sm btn-sec" data-act="setKeysetFee">Set Fee</button>
+        </div>
+      </div>
+      <div style="margin-bottom:8px;font-weight:600;font-size:.85rem">Public Keys (${keys.length} denominations)</div>
+      <div class="tw"><table class="tbl">
+        <thead><tr><th>Amount (sats)</th><th>Public Key</th><th></th></tr></thead>
+        <tbody>
+          ${keys.map(([a,p]) => `<tr>
+            <td><strong class="accent">${esc(a)}</strong></td>
+            <td class="mono" style="font-size:.72rem">${esc(p)}</td>
+            <td><button class="rbtn" data-act="copyText" data-arg="${esc(p)}">Copy</button></td>
+          </tr>`).join("")}
+        </tbody>
+      </table></div>
+    `;
+  } catch(e) {
+    document.getElementById("ks-detail").innerHTML = errBox(e);
+  }
+}
+
+function showKeysetList() {
+  curKs = null;  // non-null only while the detail view is open
+  document.getElementById("ks-list-view").style.display = "block";
+  document.getElementById("ks-detail-view").style.display = "none";
+}
+
+// ── Quotes Tab ──────────────────────────────────────────────
+const STATE_CLS = {PAID: 'paid', ISSUED: 'issued', PENDING: 'pending'};
+
+async function loadQuotes() {
+  try {
+    const d = await adminApi("/quotes");
+    allQuotes = [];
+    (d.mint_quotes || []).forEach(q => allQuotes.push({...q, _type: 'mint'}));
+    (d.melt_quotes || []).forEach(q => allQuotes.push({...q, _type: 'melt'}));
+    allQuotes.sort((a,b) => (b.created||0) - (a.created||0));
+    renderQuotes();
+  } catch(e) {
+    document.getElementById("qt-body").innerHTML = errBox(e);
+  }
+}
+
+// Offer only what the backend accepts: delete refuses PAID/ISSUED mint quotes and
+// PAID/PENDING melts; revoke is the mint-quote override; abort is for PENDING bolt11 melts.
+function quoteActions(q) {
+  const id = esc(q.quote_id), out = [];
+  const mint = q._type === 'mint';
+  if (!(mint ? ['PAID', 'ISSUED'] : ['PAID', 'PENDING']).includes(q.state))
+    out.push(`<button class="rbtn rbtn-bad" data-act="deleteQuote" data-arg="${id}" data-arg2="${q._type}">Delete</button>`);
+  if (mint && (q.state === 'PAID' || q.state === 'ISSUED'))
+    out.push(`<button class="rbtn rbtn-bad" data-act="revokeQuote" data-arg="${id}">Revoke</button>`);
+  if (!mint && q.state === 'PENDING' && q.method !== 'self')
+    out.push(`<button class="rbtn" data-act="abortMelt" data-arg="${id}">Abort</button>`,
+             `<button class="rbtn rbtn-bad" data-act="forceAbortMelt" data-arg="${id}">Force abort</button>`);
+  return out.join(' ');
+}
+
+function renderQuotes() {
+  const filtered = currentFilter === 'all' ? allQuotes
+    : (currentFilter === 'mint' || currentFilter === 'melt') ? allQuotes.filter(q => q._type === currentFilter)
+    : allQuotes.filter(q => q.state === currentFilter);
+
+  if (!filtered.length) {
+    document.getElementById("qt-body").innerHTML = '<div class="empty">No quotes match filter</div>';
+    return;
+  }
+
+  const pages = Math.ceil(filtered.length / PAGE);
+  qPage = Math.max(0, Math.min(qPage, pages - 1));
+  const rows = filtered.slice(qPage * PAGE, qPage * PAGE + PAGE);
+
+  document.getElementById("qt-body").innerHTML = `
+    <div class="tw"><table class="tbl">
+      <thead><tr>
+        <th>Type</th><th>Quote ID</th><th>Amount</th><th>State</th><th>Method</th><th>Payment hash</th><th>Created</th><th>Expired</th><th></th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(q => `<tr>
+            <td>${badge(q._type, q._type === 'mint' ? 'active' : 'pending')}</td>
+            <td>${copyBtn(q.quote_id, 16)}</td>
+            <td><strong>${esc(q.amount ?? '?')}</strong> sats</td>
+            <td>${badge(q.state, STATE_CLS[q.state] || 'unpaid')}</td>
+            <td>${esc(q.method || '?')}</td>
+            <td>${q.payment_hash ? copyBtn(q.payment_hash, 12) : '<span class="muted">-</span>'}</td>
+            <td class="muted">${esc(fmtDate(q.created))}</td>
+            <td>${q.expired ? badge('Yes', 'expired') : '<span class="muted">No</span>'}</td>
+            <td style="white-space:nowrap">${quoteActions(q)}</td>
+          </tr>`).join("")}
+      </tbody>
+    </table></div>
+    <div class="hint" style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      ${pages > 1 ? `<button class="rbtn" data-act="quotePage" data-arg="-1"${qPage ? '' : ' disabled'}>&larr; Prev</button>
+      <span>Page ${qPage + 1} of ${pages}</span>
+      <button class="rbtn" data-act="quotePage" data-arg="1"${qPage < pages - 1 ? '' : ' disabled'}>Next &rarr;</button>` : ''}
+      <span>Showing ${rows.length} of ${filtered.length} (${allQuotes.length} total). Click an ID or hash to copy.</span>
+    </div>
+  `;
+}
+
+function quotePage(delta) { qPage += Number(delta); renderQuotes(); }
+
+const findQuote = (id, type) => allQuotes.find(q => q.quote_id === id && q._type === type);
+
+// Reload after every quote action, success or not: a refusal usually means the state moved.
+async function afterQuoteAction() {
+  await loadQuotes();
+  loadOverview(true);
+}
+
+async function deleteQuote(quoteId, type) {
+  if (!confirm('Delete this ' + type + ' quote?\n\nID: ' + quoteId)) return;
+  try {
+    await post("/quotes/delete", {quote_id: quoteId, type});
+    showResult("qt-res", "Deleted " + type + " quote " + quoteId, "ok");
+  } catch(e) {
+    showResult("qt-res", "Delete failed: " + e.message, "err");
+  }
+  await afterQuoteAction();
+}
+
+async function revokeQuote(quoteId) {
+  const q = findQuote(quoteId, 'mint') || {};
+  const amt = (q.amount ?? '?') + ' sats';
+  const ok = q.state === 'PAID'
+    ? typedConfirm('REVOKE a PAID mint quote?\n\n' +
+        'The customer has PAID ' + amt + ' for this quote but has NOT minted their tokens yet. ' +
+        'Revoking deletes the quote: they can never mint, and their deposit is destroyed as far as the mint is concerned.\n\n' +
+        'Only do this if you have refunded them some other way or know the payment is bogus.\n\nID: ' + quoteId, 'REVOKE')
+    : confirm('Revoke this ' + (q.state || '') + ' mint quote?\n\n' +
+        'The quote is deleted' + (q.state === 'ISSUED' ? ' and ' + amt + ' is subtracted from total issued: the tokens minted from it are declared never-to-be-redeemed. ' +
+        'If they ARE redeemed later, outstanding liability goes negative.' : '.') + '\n\nID: ' + quoteId);
+  if (!ok) return;
+  try {
+    const d = await post("/quotes/revoke", {quote_id: quoteId});
+    showResult("qt-res", "Revoked mint quote " + d.quote_id + " (was " + d.was_state + "); total issued reduced by " +
+      d.issued_decremented + " sats.", "ok");
+  } catch(e) {
+    showResult("qt-res", "Revoke failed: " + e.message, "err");
+  }
+  await afterQuoteAction();
+}
+
+const ABORT_RESULT = {
+  'settled-not-aborted': 'Lightning shows the payment SETTLED: the quote was marked PAID instead of aborted.',
+  'in-flight-or-unconfirmed': 'Lightning did not confirm a failure (in flight or unknown). Nothing changed; the quote stays PENDING. Force abort only if you KNOW the payment failed.',
+  'aborted-confirmed-failed': "Lightning confirmed the payment FAILED: the customer's inputs were un-spent and the quote reset.",
+  'aborted-forced': "Force-aborted: the customer's inputs were un-spent on your assertion that the payment failed.",
+  'no-op-not-pending': 'The quote is no longer PENDING. Nothing changed.',
+  'no-inflight-record': 'No in-flight record to reverse. Nothing changed.',
+};
+
+async function abortMelt(quoteId, force) {
+  const q = findQuote(quoteId, 'melt') || {};
+  const hash = q.payment_hash || '(none recorded)';
+  const ok = force
+    ? typedConfirm('FORCE-abort this PENDING melt?\n\n' +
+        "DANGER: you are asserting the Lightning payment FAILED and authorizing the mint to un-spend the customer's inputs. " +
+        'If the payment actually went through (or still goes through), the mint pays TWICE.\n\n' +
+        'The mint still re-checks Lightning and settles instead if it sees the payment succeeded, but an in-flight payment ' +
+        'looks the same as a failed one. Only force after verifying on your node that this payment FAILED.\n\n' +
+        'Payment hash: ' + hash + '\nQuote: ' + quoteId, 'FORCE')
+    : confirm('Abort this PENDING melt?\n\nThe mint re-checks the payment on Lightning first:\n' +
+        '- settled: the quote is marked PAID (not aborted)\n' +
+        "- confirmed failed: the customer's inputs are un-spent and the quote reset\n" +
+        '- anything ambiguous: nothing changes\n\nPayment hash: ' + hash + '\nQuote: ' + quoteId);
+  if (!ok) return;
+  try {
+    const d = await post("/melt/abort", force ? {quote_id: quoteId, force: true} : {quote_id: quoteId});
+    const msg = ABORT_RESULT[d.result] || (d.aborted
+      ? "Aborted without a Lightning re-check: the customer's inputs were un-spent."
+      : 'Not aborted' + (d.result ? ': ' + d.result : '.'));
+    showResult("qt-res", msg + "\n\nquote " + (d.quote_id || quoteId) + " | aborted: " + !!d.aborted +
+      " | Lightning checked: " + (d.ln_checked ?? 'n/a'),
+      d.aborted || d.result === 'settled-not-aborted' ? "ok" : "");
+  } catch(e) {
+    showResult("qt-res", "Abort failed: " + e.message, "err");
+  }
+  await afterQuoteAction();
+}
+
+document.getElementById("qt-filter").addEventListener("click", e => {
+  if (!e.target.dataset.f) return;
+  currentFilter = e.target.dataset.f;
+  qPage = 0;
+  document.querySelectorAll("#qt-filter button").forEach(b => b.classList.remove("on"));
+  e.target.classList.add("on");
+  renderQuotes();
+});
+
+// ── Tokens Tab ──────────────────────────────────────────────
+async function loadSpent() {
+  try {
+    const d = await adminApi("/spent");
+    document.getElementById("tk-spent").innerHTML = `
+      <div style="display:flex;gap:24px;margin-bottom:8px">
+        <div><span class="muted">Spent secrets:</span> <strong class="accent">${esc(d.spent_count || 0)}</strong></div>
+        <div><span class="muted">Spent Y-points:</span> <strong class="accent">${esc(d.spent_ys_count || 0)}</strong></div>
+      </div>
+      <div class="hint">These counts should match. Spent secrets are checked during swap to prevent double-spending.</div>
+    `;
+  } catch(e) {
+    document.getElementById("tk-spent").innerHTML = errBox(e);
+  }
+}
+
+async function checkSpent() {
+  const input = document.getElementById("tk-check-input").value.trim();
+  if (!input) return;
+  // A compressed point is looked up as Y; anything else is a secret.
+  const isY = /^0[23][0-9a-f]{64}$/i.test(input);
+  try {
+    const d = await post("/spent/check", isY ? {Y: input.toLowerCase()} : {secret: input});
+    const what = isY ? "Y-point" : "Secret";
+    if (d.spent) {
+      showResult("tk-check-res", what + ": SPENT - This token has been redeemed and cannot be used again.", "err");
+    } else {
+      showResult("tk-check-res", what + ": UNSPENT - This token has not been seen by the mint (or is not tracked).", "ok");
+    }
+  } catch(e) {
+    showResult("tk-check-res", "Error: " + e.message, "err");
+  }
+}
+
+// ── Lightning Tab ───────────────────────────────────────────
+async function loadLightning() {
+  try {
+    const d = await adminApi("/lightning");
+    if (d.type === 'none') {
+      document.getElementById("ln-body").innerHTML = `
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <span class="dot dot-warn"></span>
+          <strong>No Lightning backend configured</strong>
+        </div>
+        <div class="muted" style="font-size:.85rem">
+          Use the form on the right to configure a Lightning backend for bolt11 minting/melting (NUT-04/05).
+        </div>
+      `;
+    } else {
+      document.getElementById("ln-body").innerHTML = `
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+          <span class="dot dot-ok"></span>
+          <strong>Lightning backend active</strong>
+        </div>
+        <table class="tbl">
+          <tbody>
+            <tr><td class="muted" style="width:120px">Type</td><td><strong>${esc(d.type)}</strong></td></tr>
+            <tr><td class="muted">URL</td><td class="mono" style="word-break:break-all">${esc(d.url || 'N/A')}</td></tr>
+            <tr><td class="muted">API Key</td><td>${d.api_key_set ? badge('Configured', 'active') : badge('Not set', 'inactive')}</td></tr>
+          </tbody>
+        </table>
+        <div style="margin-top:12px">
+          <button class="btn btn-sm btn-danger" data-act="clearLn">Remove Backend</button>
+        </div>
+      `;
+      // Pre-fill form with current values
+      document.getElementById("ln-type").value = d.type;
+      document.getElementById("ln-url").value = d.url || '';
+      toggleLnFields();
+    }
+  } catch(e) {
+    document.getElementById("ln-body").innerHTML = errBox(e);
+  }
+}
+
+function toggleLnFields() {
+  const type = document.getElementById("ln-type").value;
+  const fields = document.getElementById("ln-fields");
+  const apikeyField = document.getElementById("ln-apikey-field");
+  const macaroonField = document.getElementById("ln-macaroon-field");
+  if (type === 'none') {
+    fields.style.display = 'none';
+  } else {
+    fields.style.display = 'block';
+    apikeyField.style.display = type === 'lnbits' ? 'flex' : 'none';
+    macaroonField.style.display = type === 'lnd' ? 'flex' : 'none';
+  }
+}
+
+async function configureLn() {
+  const type = document.getElementById("ln-type").value;
+  let body;
+  if (type === 'none') {
+    if (!confirm('Remove Lightning backend configuration?')) return;
+    body = {type: 'none'};
+  } else if (type === 'lnbits') {
+    const url = document.getElementById("ln-url").value.trim();
+    const apiKey = document.getElementById("ln-apikey").value.trim();
+    if (!url || !apiKey) { alert('URL and API Key are required'); return; }
+    body = {type: 'lnbits', url, api_key: apiKey};
+  } else if (type === 'lnd') {
+    const url = document.getElementById("ln-url").value.trim();
+    const macaroon = document.getElementById("ln-macaroon").value.trim();
+    if (!url || !macaroon) { alert('URL and Macaroon are required'); return; }
+    body = {type: 'lnd', url, macaroon};
+  }
+  try {
+    const d = await post("/lightning/configure", body);
+    showResult("ln-config-res", "Configured: " + d.type + (d.url ? " at " + d.url : ""), "ok");
+    await loadLightning();
+    loadOverview(true);
+  } catch(e) {
+    showResult("ln-config-res", "Error: " + e.message, "err");
+  }
+}
+
+async function clearLn() {
+  if (!confirm('Remove Lightning backend? bolt11 minting/melting will be disabled.')) return;
+  try {
+    await post("/lightning/configure", {type: 'none'});
+    showResult("ln-config-res", "Lightning backend removed", "ok");
+    await loadLightning();
+    loadOverview(true);
+  } catch(e) {
+    showResult("ln-config-res", "Error: " + e.message, "err");
+  }
+}
+
+// A real round-trip to the backend: report ok/error exactly as the mint saw it.
+async function testLn() {
+  showResult("ln-config-res", "Testing...", "");
+  try {
+    const d = await post("/lightning/test");
+    const ok = d.status === 'ok';
+    const lines = [
+      String(d.status || '?').toUpperCase() + ": " + (d.type || '?') + (d.url ? " at " + d.url : ""),
+      d.http_status != null ? "HTTP status: " + d.http_status : "",
+      d.balance_msat != null ? "Balance: " + Math.floor(Number(d.balance_msat) / 1000).toLocaleString() + " sats" : "",
+      d.detail != null ? "Detail: " + (typeof d.detail === 'string' ? d.detail : JSON.stringify(d.detail)) : "",
+    ];
+    showResult("ln-config-res", lines.filter(Boolean).join("\n"), ok ? "ok" : "err");
+  } catch(e) {
+    showResult("ln-config-res", "Test failed: " + e.message, "err");
+  }
+}
+
+// ── Info Tab ────────────────────────────────────────────────
+async function loadInfo() {
+  try {
+    const d = await adminApi("/info");
+    const nuts = d.nuts || {};
+    document.getElementById("nf-body").innerHTML = `
+      <table class="tbl" style="margin-bottom:16px">
+        <tbody>
+          <tr><td class="muted" style="width:140px">Name</td><td><strong>${esc(d.name || 'Unnamed')}</strong></td></tr>
+          <tr><td class="muted">Version</td><td class="mono">${esc(d.version || '?')}</td></tr>
+          <tr><td class="muted">Description</td><td>${esc(d.description || 'N/A')}</td></tr>
+        </tbody>
+      </table>
+      <div style="font-weight:600;font-size:.85rem;margin-bottom:8px">Supported NUTs</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${Object.keys(nuts).sort((a,b) => +a - +b).map(n => {
+          const nut = nuts[n] || {};
+          const methods = Array.isArray(nut.methods) ? nut.methods.map(m => m.method + '/' + m.unit +
+            (m.min_amount != null || m.max_amount != null ? ' ' + (m.min_amount ?? 0) + '-' + (m.max_amount ?? '∞') : '')).join(', ') : '';
+          const supported = nut.supported !== undefined ? (nut.supported ? 'Yes' : 'No') : '';
+          const detail = methods || supported || (nut.disabled ? 'disabled' : 'supported');
+          return `<div class="ki" style="min-width:80px;cursor:default" title="NUT-${esc(n)}: ${esc(detail)}">
+            <div class="ka">NUT-${esc(n)}</div>
+            <div class="kp">${esc(detail)}</div>
+          </div>`;
+        }).join("")}
+      </div>
+      <div class="hint" style="margin-top:12px">
+        This is the public <code class="mono">/v1/info</code> response visible to all wallets.
+      </div>
+    `;
+    // Pre-fill edit form
+    document.getElementById("nf-name").value = d.name || '';
+    document.getElementById("nf-desc").value = d.description || '';
+  } catch(e) {
+    document.getElementById("nf-body").innerHTML = errBox(e);
+  }
+}
+
+async function updateInfo() {
+  const name = document.getElementById("nf-name").value.trim();
+  const description = document.getElementById("nf-desc").value.trim();
+  if (!name && !description) { alert('Enter a name or description'); return; }
+  try {
+    const body = {};
+    if (name) body.name = name;
+    if (description) body.description = description;
+    const d = await post("/info/update", body);
+    showResult("nf-res", "Updated: " + d.name + " - " + d.description, "ok");
+    await loadInfo();
+  } catch(e) {
+    showResult("nf-res", "Error: " + e.message, "err");
+  }
+}
+
+// ── Init ────────────────────────────────────────────────────
+document.getElementById("autorefresh").addEventListener("change", e => {
+  if (e.target.checked) startAuto(loadOverview); else stopAuto();
+});
+
+async function init() {
+  await Promise.all([loadOverview(), loadSettings()]);
+  startAuto(loadOverview);
+}
+
+// Lazy-load tabs on first visit
+const loaded = {ov: true, ks: false, qt: false, tk: false, ln: false, nf: false};
+document.querySelectorAll("#main-tabs .tab").forEach(btn => {
+  btn.addEventListener("click", async () => {
+    const t = btn.dataset.tab;
+    if (loaded[t]) return;
+    loaded[t] = true;
+    if (t === 'ks') await loadKeysets();
+    if (t === 'qt') await loadQuotes();
+    if (t === 'tk') await loadSpent();
+    if (t === 'ln') await loadLightning();
+    if (t === 'nf') await loadInfo();
+  });
+});
+
+// Event delegation: CSP blocks inline on*= handlers, so elements carry data-act
+// (+ optional data-arg/data-arg2) and we resolve them to functions here. Args are
+// data, never code — strictly safer than the old inline onclick handlers.
+const ACTIONS = {
+  loadOverview, updateSettings, generateKeyset, loadKeysets, showKeysetList,
+  loadQuotes, loadSpent, checkSpent, loadLightning, toggleLnFields, configureLn,
+  testLn, loadInfo, updateInfo, clearLn, copyText, viewKeyset, activateKeyset,
+  deactivateKeyset, setKeysetFee, deleteQuote, revokeQuote, abortMelt, quotePage,
+  forceAbortMelt: (id) => abortMelt(id, true),
+};
+document.addEventListener('click', (e) => {
+  const el = e.target.closest('[data-act]');
+  if (!el) return;
+  const fn = ACTIONS[el.dataset.act];
+  if (!fn) return;
+  if ('arg2' in el.dataset) fn(el.dataset.arg, el.dataset.arg2);
+  else if ('arg' in el.dataset) fn(el.dataset.arg);
+  else fn();
+});
+document.addEventListener('change', (e) => {
+  const el = e.target.closest('[data-change]');
+  if (!el) return;
+  const fn = ACTIONS[el.dataset.change];
+  if (fn) fn();
+});
+
+init();
+</script>
+</body>
+</html>
